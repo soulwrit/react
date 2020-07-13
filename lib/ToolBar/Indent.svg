@@ -1,0 +1,5 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg class="icon" width="16px" height="16.00px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<path fill="#8a8a8a" d="M0 64l1024 0 0 128-1024 0zM384 256l640 0 0 128-640 0zM384 448l640 0 0 128-640 0zM384 640l640 0 0 128-640 0zM0 832l1024 0 0 128-1024 0zM0 704l0-384 256 192z" />
+</svg>
