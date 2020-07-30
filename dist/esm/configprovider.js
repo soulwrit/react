@@ -1,6 +1,6 @@
 import { g as _objectWithoutProperties } from './_rollupPluginBabelHelpers-62f9ecef.js';
 import React__default from 'react';
-import { D as DEFAULT, C as ConfigContext } from './Context-859f32e3.js';
+import { D as DEFAULT, C as ConfigContext } from './Context-2b6bec3a.js';
 
 var ConfigProvider = function ConfigProvider(props) {
   var children = props.children,

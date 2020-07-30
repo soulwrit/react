@@ -8,22 +8,34 @@ var Icon = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
   var type = props.type,
       size = props.size,
       className = props.className,
-      rest = _objectWithoutProperties(props, ["type", "size", "className"]);
+      children = props.children,
+      color = props.color,
+      style = props.style,
+      rest = _objectWithoutProperties(props, ["type", "size", "className", "children", "color", "style"]);
 
-  return /*#__PURE__*/React__default.createElement('i', _objectSpread2(_objectSpread2({
-    ref: ref
-  }, rest), {}, {
-    className: classnames(CSSUtil.icon, CSSUtil.join(CSSUtil.icon, type), CSSUtil.join(CSSUtil.icon, size), className)
-  }));
+  var typeIsString = typeof type === 'string';
+  return /*#__PURE__*/React__default.createElement('i', _objectSpread2(_objectSpread2({}, rest), {}, {
+    ref: ref,
+    className: classnames(CSSUtil.icon, typeIsString ? CSSUtil.join(CSSUtil.icon, type) : void 0, CSSUtil.join(CSSUtil.icon, size), className),
+    style: Object.assign({
+      color: color
+    }, style)
+  }), typeIsString ? null : type);
 });
 Icon.defaultProps = {
-  size: '1x'
+  className: void 0,
+  color: void 0,
+  size: '1x',
+  type: 'form'
 };
 
 if (window.DEV) {
   Icon.propTypes = {
-    type: propTypes.string.isRequired,
-    size: propTypes.oneOf(['lg', '1x', '2x', '3x', '4x', '5x'])
+    className: propTypes.string,
+    color: propTypes.string,
+    size: propTypes.oneOf(['lg', '1x', '2x', '3x', '4x', '5x']),
+    type: propTypes.oneOfType([propTypes.string, propTypes.node]).isRequired,
+    style: propTypes.object
   };
 }
 

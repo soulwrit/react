@@ -3,10 +3,7 @@ import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil } from './dependency-8ea69cb4.js';
-
-function throwError() {
-  throw new Error('Only `List.Item`, `List.Head`, `List.Foot` used in `List`.');
-}
+import { a as assert_1 } from './assert-cc694573.js';
 
 function Head(props) {
   var value = props.value,
@@ -52,32 +49,24 @@ function List(props) {
   return /*#__PURE__*/React__default.createElement(type, _objectSpread2({
     className: classnames(CSSUtil.list, type, className),
     children: React__default.Children.map(children, function (Child, index) {
-      if (!Child) return throwError();
+      assert_1.truly(Child != null, 'Only `List.Item`, `List.Head`, `List.Foot` used in `List`.');
 
       switch (Child.type) {
         case Head:
           {
-            return index === 0 ? /*#__PURE__*/React__default.cloneElement(Child, {
-              key: index
-            }) : null;
+            return index === 0 ? Child : null;
           }
 
         case Foot:
           {
-            return index === lastIndex ? /*#__PURE__*/React__default.cloneElement(Child, {
-              key: index
-            }) : null;
+            return index === lastIndex ? Child : null;
           }
 
         case Item:
           {
-            return /*#__PURE__*/React__default.cloneElement(Child, {
-              key: index
-            });
+            return Child;
           }
       }
-
-      throwError();
     })
   }, rest));
 }

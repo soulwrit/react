@@ -3,6 +3,7 @@ import React__default, { useState } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil } from './dependency-8ea69cb4.js';
+import { a as assert_1 } from './assert-cc694573.js';
 
 var Item = function Item(props) {
   var children = props.children,
@@ -50,16 +51,13 @@ var Accordion = function Accordion(props) {
   return /*#__PURE__*/React__default.createElement('div', {
     className: classnames(CSSUtil.accordion, className),
     children: React__default.Children.map(children, function (C, key) {
-      if (!C || C.type !== Item) {
-        throw new Error('Only `Accordion.Item` used in `Accordion`.');
-      }
-
+      assert_1.truly(C && C.type === Item, 'Only `Accordion.Item` used in `Accordion`.');
       var value = C.props.value;
       var index = expanded.indexOf(key);
       var actived = index > -1;
 
       var onExpand = function onExpand(e) {
-        var values;
+        var values = expanded;
         if (e) e.stopPropagation();
 
         if (multiple) {

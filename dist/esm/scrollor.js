@@ -2,17 +2,17 @@ import { a as _inherits, b as _createSuper, d as _classCallCheck, _ as _definePr
 import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
-import { n as noop_1 } from './noop-469b0e21.js';
 import { a as assert_1 } from './assert-cc694573.js';
+import { n as noop_1 } from './noop-469b0e21.js';
 import { r as raf } from './raf-4503f6a0.js';
 
 var barProps = {
   x: {
     client: 'clientX',
-    clientSize: 'clientWidth',
     dir: 'left',
     min: 'minHeight',
     offset: 'offsetLeft',
+    offsetSize: 'offsetWidth',
     scroll: 'scrollLeft',
     scrollSize: 'scrollWidth',
     size: 'width',
@@ -20,10 +20,10 @@ var barProps = {
   },
   y: {
     client: 'clientY',
-    clientSize: 'clientHeight',
     dir: 'top',
     min: 'minWidth',
     offset: 'offsetTop',
+    offsetSize: 'offsetHeight',
     scroll: 'scrollTop',
     scrollSize: 'scrollHeight',
     size: 'height',
@@ -59,7 +59,7 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
       }
     });
 
-    _defineProperty(_assertThisInitialized(_this), "saveRef", function (elememt) {
+    _defineProperty(_assertThisInitialized(_this), "setRef", function (elememt) {
       _this.el = elememt;
     });
 
@@ -73,15 +73,15 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
             scrollHeight = el.scrollHeight,
             scrollTop = el.scrollTop,
             scrollWidth = el.scrollWidth;
-        var top = void 0;
-        var left = void 0;
+        var top = undefined;
+        var left = undefined;
 
         if (yTrack) {
-          top = Math.round(scrollTop / scrollHeight * yTrack.clientHeight);
+          top = Math.round(scrollTop / scrollHeight * yTrack.offsetHeight);
         }
 
         if (xTrack) {
-          left = Math.round(scrollLeft / scrollWidth * xTrack.clientWidth);
+          left = Math.round(scrollLeft / scrollWidth * xTrack.offsetWidth);
         }
 
         _this.setState({
@@ -103,12 +103,12 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
 
         var _barProps$axis = barProps[axis],
             client = _barProps$axis.client,
-            clientSize = _barProps$axis.clientSize,
+            offsetSize = _barProps$axis.offsetSize,
             scroll = _barProps$axis.scroll,
             scrollSize = _barProps$axis.scrollSize;
         var elSize = el[scrollSize];
-        var trackSize = track[clientSize];
-        var barSize = bar[clientSize];
+        var trackSize = track[offsetSize];
+        var barSize = bar[offsetSize];
         var maxDis = trackSize - barSize || 1;
         var curr = e[client] - barSize;
 
@@ -122,13 +122,16 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
       };
     });
 
+    _defineProperty(_assertThisInitialized(_this), "onContextMenu", function (e) {
+      e.preventDefault();
+      return false;
+    });
+
     _this.state = {
-      width: void 0,
-      height: void 0,
-      top: void 0,
-      left: void 0,
-      scrollWidth: void 0,
-      scrollHeight: void 0
+      width: undefined,
+      height: undefined,
+      top: undefined,
+      left: undefined
     };
     return _this;
   }
@@ -137,6 +140,7 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
     key: "componentDidMount",
     value: function componentDidMount() {
       this.init();
+      this.setStartPos();
       document.addEventListener('readystatechange', this.onReadyStateChange);
       window.addEventListener('resize', this.onWindowReisize, false);
     }
@@ -147,22 +151,61 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
       window.removeEventListener('resize', this.onWindowReisize, false);
     }
   }, {
+    key: "UNSAFE_componentWillUpdate",
+    value: function UNSAFE_componentWillUpdate(prevProps) {
+      if (prevProps.children !== this.props.children) {
+        this.onWindowReisize();
+      }
+    }
+  }, {
     key: "init",
     value: function init() {
-      var _this$el = this.el,
-          clientWidth = _this$el.clientWidth,
-          clientHeight = _this$el.clientHeight,
-          scrollWidth = _this$el.scrollWidth,
-          scrollHeight = _this$el.scrollHeight;
-      var sizeX = clientWidth / scrollWidth;
-      var sizeY = clientHeight / scrollHeight;
-      assert_1.ok(Number.isNaN(sizeX), 'Invalid scroll x size.');
-      assert_1.ok(Number.isNaN(sizeY), 'Invalid scroll y size.');
-      this.setState({
-        width: sizeX >= 1 ? void 0 : sizeX * 100 + '%',
-        height: sizeY >= 1 ? void 0 : sizeY * 100 + '%',
-        scrollWidth: scrollWidth,
-        scrollHeight: scrollHeight
+      var _this2 = this;
+
+      raf(function () {
+        var _this2$props = _this2.props,
+            min = _this2$props.min,
+            timeout = _this2$props.timeout;
+
+        var calc = function calc() {
+          try {
+            var _this2$el = _this2.el,
+                offsetWidth = _this2$el.offsetWidth,
+                offsetHeight = _this2$el.offsetHeight,
+                scrollWidth = _this2$el.scrollWidth,
+                scrollHeight = _this2$el.scrollHeight; // 异步情况下，子元素没加入DOM中，导致滚地区没有大小，因此重复检测一下
+
+            if (offsetHeight > 0 || offsetWidth > 0) {
+              clearInterval(timer);
+              timer = null;
+            }
+
+            var sizeX = offsetWidth / (scrollWidth || 1);
+            var sizeY = offsetHeight / (scrollHeight || 1);
+            assert_1.ok(Number.isNaN(sizeX), 'Invalid scroll x size.');
+            assert_1.ok(Number.isNaN(sizeY), 'Invalid scroll y size.');
+            var minX = (scrollWidth - offsetWidth) * sizeX;
+            var minY = (scrollHeight - offsetHeight) * sizeY;
+
+            _this2.setState({
+              width: sizeX >= 1 || minX < min ? undefined : sizeX * 100 + '%',
+              height: sizeY >= 1 || minY < min ? undefined : sizeY * 100 + '%'
+            });
+          } catch (error) {}
+        };
+
+        var sTime = Date.now();
+        var timer = setInterval(function () {
+          var eTime = Date.now();
+
+          if (eTime - sTime > timeout) {
+            // 超过10s 滚动条没有加载出来，就放弃初始计算
+            clearInterval(timer);
+            timer = null;
+          }
+
+          calc();
+        }, 100);
       });
     }
   }, {
@@ -192,7 +235,7 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
   }, {
     key: "getBarMouseDown",
     value: function getBarMouseDown(axis) {
-      var _this2 = this;
+      var _this3 = this;
 
       return function (e) {
         if (e.ctrlKey || e.button === 2) {
@@ -203,14 +246,14 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
         var _barProps$axis2 = barProps[axis],
             client = _barProps$axis2.client,
             offset = _barProps$axis2.offset,
-            clientSize = _barProps$axis2.clientSize,
+            offsetSize = _barProps$axis2.offsetSize,
             scroll = _barProps$axis2.scroll,
             scrollSize = _barProps$axis2.scrollSize;
-        var el = _this2.el;
+        var el = _this3.el;
         var elSize = el[scrollSize];
         var currentTarget = e.currentTarget;
-        var barSize = currentTarget[clientSize];
-        var trackSize = currentTarget.parentElement[clientSize];
+        var barSize = currentTarget[offsetSize];
+        var trackSize = currentTarget.parentElement[offsetSize];
         var maxDis = trackSize - barSize || 1;
         var dis = e[client] - currentTarget[offset]; // console.log('Down Client', e[client]);
         // console.log('Down Offset', currentTarget[offset]);
@@ -268,11 +311,13 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
 
       return /*#__PURE__*/React__default.createElement('div', {
         className: classnames('track', axis, trackClassName),
+        onContextMenu: this.onContextMenu,
         onMouseDown: this.getTrackMouseDown(axis),
         ref: "".concat(axis, "Track"),
         style: trackStyle
       }, /*#__PURE__*/React__default.createElement('div', {
         className: classnames('bar', barClassName),
+        onContextMenu: this.onContextMenu,
         onMouseDown: this.getBarMouseDown(axis),
         ref: "".concat(axis, "Bar"),
         style: barStyle
@@ -284,55 +329,65 @@ var Scrollor = /*#__PURE__*/function (_React$PureComponent) {
       var _this$props2 = this.props,
           children = _this$props2.children,
           className = _this$props2.className,
-          offset = _this$props2.offset,
+          viewClassName = _this$props2.viewClassName,
           _native = _this$props2["native"],
+          offset = _this$props2.offset,
+          onClick = _this$props2.onClick,
+          onContextMenu = _this$props2.onContextMenu,
           size = _this$props2.size,
           stress = _this$props2.stress,
-          viewXOffset = _this$props2.viewXOffset;
-      var scrollWidth = this.state.scrollWidth;
-      var wrapStyle = offset >= 0 && offset !== 17 ? {
-        paddingBottom: offset,
-        paddingRight: offset,
-        marginRight: -offset,
-        marginBottom: -offset
-      } : null;
-      var viewStyle = scrollWidth ? {
-        width: scrollWidth,
-        paddingRight: viewXOffset || size
-      } : null;
+          viewRef = _this$props2.viewRef,
+          viewXOffset = _this$props2.viewXOffset,
+          viewYOffset = _this$props2.viewYOffset;
+      var isDefaultOffset = offset >= 0 && offset === 17;
+      var wrapStyle = {
+        marginRight: isDefaultOffset ? undefined : -offset,
+        marginBottom: isDefaultOffset ? undefined : -offset,
+        overflowY: this.state.height == null ? 'hidden' : undefined,
+        overflowX: this.state.width == null ? 'hidden' : undefined
+      };
+      var viewStyle = {
+        paddingRight: viewXOffset || size,
+        paddingBottom: viewYOffset || size
+      };
       return _native ? children : /*#__PURE__*/React__default.createElement('div', {
         className: classnames('scr', className, {
           stress: stress
-        })
-      }, /*#__PURE__*/React__default.createElement('div', {
-        children: /*#__PURE__*/React__default.createElement('div', {
-          className: 'view',
-          style: viewStyle,
-          children: children
         }),
-        className: 'wrap',
-        ref: this.saveRef,
+        onContextMenu: onContextMenu
+      }, /*#__PURE__*/React__default.createElement('div', {
+        className: 'wrapper',
+        ref: this.setRef,
         onScroll: this.onScroll,
         style: wrapStyle
-      }), this.getBar('x'), this.getBar('y'));
+      }, /*#__PURE__*/React__default.createElement('div', {
+        className: classnames('view', viewClassName),
+        ref: viewRef,
+        style: viewStyle,
+        onClick: onClick
+      }, children)), this.getBar('x'), this.getBar('y'));
     }
   }]);
 
   return Scrollor;
 }(React__default.PureComponent);
 Scrollor.defaultProps = {
-  barClassName: void 0,
-  bgColor: void 0,
-  className: void 0,
+  barClassName: undefined,
+  bgColor: undefined,
+  className: undefined,
   "native": false,
   min: 24,
   offset: 17,
+  onContextMenu: noop_1,
   onScroll: noop_1,
   stress: true,
-  size: void 0,
-  start: void 0,
-  trackClassName: void 0,
-  viewXOffset: void 0
+  size: undefined,
+  start: undefined,
+  trackClassName: undefined,
+  viewRef: undefined,
+  viewXOffset: undefined,
+  viewYOffset: undefined,
+  timeout: 10000
 };
 
 if (window.DEV) {
@@ -349,6 +404,10 @@ if (window.DEV) {
     // 滚动块的最小(可视大小)
     offset: propTypes.number,
     // 浏览器默认的滚动条大小
+    onClick: propTypes.func,
+    // 内容区点击事件
+    onContextMenu: propTypes.func,
+    // 右键菜单事件
     onScroll: propTypes.func,
     // 滚动事件
     size: propTypes.oneOfType([propTypes.number, propTypes.string]),
@@ -359,7 +418,13 @@ if (window.DEV) {
     // 初始定位
     trackClassName: propTypes.string,
     // 滚动轨道的类名
-    viewXOffset: propTypes.number // 内容区右侧内间距
+    viewRef: propTypes.func,
+    // 内容区的ref
+    viewXOffset: propTypes.number,
+    // 内容区右侧内间距
+    viewYOffset: propTypes.number,
+    // 内容区右侧内间距
+    timeout: propTypes.number // 滚动条加载超时数
 
   };
 }

@@ -3,14 +3,16 @@ import React__default, { isValidElement } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil } from './dependency-8ea69cb4.js';
+import { a as assert_1 } from './assert-cc694573.js';
 import { n as noop_1 } from './noop-469b0e21.js';
 import { o as objectHasOwn } from './object-has-own-6b83c90b.js';
 import ReactDOM from 'react-dom';
-import { a as assert_1 } from './assert-cc694573.js';
 import './raf-4503f6a0.js';
 import './dom-contains-5179471e.js';
-import { T as Trigger } from './Trigger-84efcddb.js';
+import { T as Trigger } from './Trigger-15f31aa8.js';
+import { g as getViewportWidth } from './dom-viewport-width-59a780a1.js';
 import { g as getViewportHeight } from './dom-viewport-height-640d289b.js';
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
 
 function Group(props) {
   return /*#__PURE__*/React__default.createElement('div', {
@@ -93,23 +95,6 @@ if (window.DEV) {
     value: propTypes.any
   };
 }
-
-/**
- * 获取页面可视宽度
- * 在混杂模式（BackCompat）下，ie10+的浏览器，
- * 三者（`window.innerWidth` `document.documentElement.clientWidth` `document.body.clientWidth`）的值都是相同的
- */
-
-function getViewportWidth() {
-  var d = document,
-      a = d.compatMode == "BackCompat" ? d.body : d.documentElement;
-  return a.clientWidth;
-}
-
-var initial = 999;
-var getZIndex = function getZIndex() {
-  return initial++;
-};
 
 function getPosition(pRect, lRect, props) {
   var placement = props.placement,
@@ -348,7 +333,9 @@ var Dropdown = /*#__PURE__*/function (_React$Component) {
           }, className),
           onMouseLeave: hoverable ? close : null,
           ref: layer,
-          style: Object.assign({}, style, coord)
+          style: visible ? Object.assign({
+            zIndex: getZIndex()
+          }, style, coord) : null
         }, _this3.mapDropList(_Body, 0, action)), container));
       });
     }

@@ -4,7 +4,7 @@ import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { t as theme, C as CSSUtil } from './dependency-8ea69cb4.js';
 import './noop-469b0e21.js';
-import { M as Model } from './Model-6a5cfb7c.js';
+import { M as Model } from './Model-6d1c225d.js';
 import { r as raf } from './raf-4503f6a0.js';
 import { PageTurn } from './pageturn.js';
 import { Tag } from './tag.js';

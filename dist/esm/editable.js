@@ -42,7 +42,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
       _this.element.focus();
     });
 
-    _defineProperty(_assertThisInitialized(_this), "onInput", function (e) {
+    _defineProperty(_assertThisInitialized(_this), "onInput", function () {
       _this.value = _this.element.innerHTML;
 
       var isEmpty = _this.isEmpty();
@@ -53,8 +53,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
         });
       }
 
-      e.target.value = _this.value;
-      _this.props.onInput && _this.props.onInput(e);
+      _this.props.onInput && _this.props.onInput(_this.value);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onKeyUp", function (e) {
@@ -64,10 +63,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
 
       _this.value = _this.element.innerHTML;
       _this.props.onKeyUp && _this.props.onKeyUp(e);
-      _this.props.onChange && _this.props.onChange({
-        event: e,
-        value: _this.value
-      });
+      _this.props.onChange && _this.props.onChange(_this.value);
     });
 
     _this.element = null;
@@ -134,7 +130,6 @@ Editable.defaultProps = {
   maxLength: Infinity,
   minLength: 0,
   placeholder: '请在此输入',
-  rafDelay: 100,
   readonly: false,
   size: 'md',
   theme: 'muted'
@@ -152,7 +147,6 @@ if (window.DEV) {
     onKeyUp: propTypes.func,
     onKeyDown: propTypes.func,
     placeholder: propTypes.string,
-    rafDelay: propTypes.number,
     readonly: propTypes.bool,
     size: propTypes.oneOf(MQ_Breakpoints),
     theme: propTypes.oneOf(theme),

@@ -1,71 +1,167 @@
-import { g as _objectWithoutProperties, h as _objectSpread2 } from './_rollupPluginBabelHelpers-62f9ecef.js';
-import React__default from 'react';
-import { p as propTypes } from './index-c0558b2a.js';
-import { c as classnames } from './index-dc594463.js';
-import { C as CSSUtil } from './dependency-8ea69cb4.js';
+import { f as _slicedToArray, g as _objectWithoutProperties, h as _objectSpread2 } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import React__default, { useState, useEffect } from 'react';
+import './index-c0558b2a.js';
+import './index-dc594463.js';
+import './dependency-8ea69cb4.js';
+import ReactDOM from 'react-dom';
+import { P as ProgressBar } from './ProgressBar-8e1b0faf.js';
+export { P as ProgressBar } from './ProgressBar-8e1b0faf.js';
 
-var ProgressBar = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
-  var className = props.className,
-      value = props.value,
-      format = props.format,
-      traceStyle = props.traceStyle,
-      status = props.status,
-      stripe = props.stripe,
-      inline = props.inline,
-      trackStyle = props.trackStyle,
-      valueStyle = props.valueStyle,
-      height = props.height,
-      rest = _objectWithoutProperties(props, ["className", "value", "format", "traceStyle", "status", "stripe", "inline", "trackStyle", "valueStyle", "height"]);
+var useProgress = function useProgress(initial, callback) {
+  var _useState = useState(initial),
+      _useState2 = _slicedToArray(_useState, 2),
+      progress = _useState2[0],
+      setProgress = _useState2[1];
 
-  return /*#__PURE__*/React__default.createElement('div', _objectSpread2({
-    className: classnames(CSSUtil.progressBar, className),
-    children: [/*#__PURE__*/React__default.createElement('div', {
-      children: /*#__PURE__*/React__default.createElement('div', {
-        className: 'inner',
-        style: Object.assign({
-          width: format(value)
-        }, traceStyle)
-      }),
-      className: classnames('outer', status, {
-        stripe: stripe,
-        inb: inline
-      }),
-      key: 0,
-      style: Object.assign({
-        height: height
-      }, trackStyle)
-    }), props.showInfo ? /*#__PURE__*/React__default.createElement('div', {
-      key: 1,
-      children: format(value),
-      className: classnames('info', {
-        inb: inline
-      }),
-      style: valueStyle
-    }) : null],
-    ref: ref
-  }, rest));
-});
-ProgressBar.defaultProps = {
-  value: 0,
-  format: function format(value) {
-    return value + '%';
-  },
-  status: 'normal',
-  inline: false
-};
+  var setProgressWrapper = function setProgressWrapper(newValue, callback) {
+    if (typeof callback === 'function') {
+      callback(progress);
+    }
 
-if (window.DEV) {
-  ProgressBar.propTypes = {
-    value: propTypes.number.isRequired,
-    format: propTypes.func,
-    inline: propTypes.bool,
-    stripe: propTypes.bool,
-    status: propTypes.oneOf(['success', 'failed', 'normal']),
-    traceStyle: propTypes.object,
-    trackStyle: propTypes.object,
-    valueStyle: propTypes.object,
-    showInfo: propTypes.bool
+    setProgress(newValue);
+  };
+
+  useEffect(function () {
+    if (typeof callback === 'function') {
+      callback(progress);
+    }
+  }, [progress]);
+  return [progress, setProgressWrapper];
+}; // export const useBackState = (initial, callback) => {
+//     const [state, setState] = useState(initial);
+//     const setStateWrapper = (nextState, callback) => {
+//         if (typeof callback === 'function') {
+//             // prev state
+//             if (callback(state, nextState) === false) {
+//                 return;
+//             }
+//         }
+//         setState(nextState);
+//     };
+//     useEffect(() => {
+//         if (typeof callback === 'function') {
+//             callback(state);
+//         }
+//     }, [state]);
+//     return [state, setStateWrapper];
+// }
+
+function getProgressSpeedmeter(step, end) {
+  var k = step;
+  var i = k / 21;
+  var end = end || 0.98;
+  return function (s) {
+    var start = s;
+
+    if (start >= end) {
+      return end;
+    }
+
+    start += k;
+    k -= i;
+
+    if (k < 0.001) {
+      k = 0.001;
+    }
+
+    return start;
   };
 }
 
-export { ProgressBar };
+function getSharedProgressBar(option) {
+  var HOC = function HOC(props) {
+    var value = props.value,
+        rest = _objectWithoutProperties(props, ["value"]);
+
+    var _useProgress = useProgress(value),
+        _useProgress2 = _slicedToArray(_useProgress, 2),
+        progress = _useProgress2[0],
+        setProgress = _useProgress2[1];
+
+    useEffect(function () {
+      context.setProgress = setProgress;
+    }, []);
+    return /*#__PURE__*/React__default.createElement(ProgressBar, _objectSpread2({
+      value: progress
+    }, rest));
+  };
+
+  var context = {
+    delay: option.delay > 30 ? option.delay : 30,
+    step: option.step || 0.05,
+    wait: !!option.wait || true,
+    autoStart: !!option.autoStart,
+    instance: null,
+    container: document.createElement('div'),
+    mount: function mount() {
+      delete option.autoStart;
+      delete option.delay;
+      delete option.step;
+      delete option.wait;
+      context.instance = /*#__PURE__*/React__default.createElement(HOC, option);
+      ReactDOM.render(context.instance, context.container);
+      document.body.appendChild(context.container);
+    },
+    unmount: function unmount() {
+      ReactDOM.unmountComponentAtNode(context.container);
+      document.body.removeChild(context.container);
+    },
+    run: function run() {
+      var progress = context.speedometer(context.form);
+
+      if (progress >= 1) {
+        if (context.wait) {
+          context.form = 0;
+          context.puase();
+          return;
+        }
+
+        return context.unmount();
+      }
+
+      context.setProgress(progress, function (progress) {
+        if (typeof option.onEneded === 'function' && progress >= 1) {
+          option.onEneded();
+        } else if (typeof option.onProgress === 'function') {
+          option.onProgress(progress);
+        }
+      });
+    },
+    go: function go(form, to, step) {
+      context.puase();
+      context.step = step || context.step;
+      context.form = form;
+      context.speedometer = getProgressSpeedmeter(context.step, to || 1);
+      context.timer = setInterval(context.run, context.delay);
+    },
+    start: function start(form, step) {
+      context.go(form, 1, step);
+    },
+    puase: function puase() {
+      if (context.timer) {
+        clearInterval(context.timer);
+        context.timer = null;
+      }
+    },
+    restart: function restart() {
+      context.timer = setInterval(context.run, context.delay);
+    },
+    end: function end(to) {
+      context.go(context.form || 0.98, to || 1);
+    }
+  };
+
+  if (context.autoStart) {
+    context.mount();
+  }
+
+  getSharedProgressBar = function wrapperFunc() {
+    return context;
+  };
+
+  return getSharedProgressBar();
+}
+
+var getCommonProgressBar = getSharedProgressBar;
+
+export { getCommonProgressBar };

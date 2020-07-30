@@ -3,86 +3,94 @@ import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { d as dirs, C as CSSUtil } from './dependency-8ea69cb4.js';
-import { M as Model } from './Model-6a5cfb7c.js';
+import { M as Model } from './Model-6d1c225d.js';
+import { o as objectHas } from './object-has-5ccd463c.js';
 
+var getLength = function getLength(value) {
+  return value.toString().trim().length;
+};
 /**
  * @constructor
  * @param {object} models 
  * @param {object} values
  */
 
-function Creator(models, values) {
+
+function Creator(models, values, name) {
   if (!(this instanceof Creator)) {
     throw new Error('Creator is a constructor!');
   }
 
+  this.name = name || 'unkown';
   this.fields = Object.create(null);
-  this.model(models, values);
+  this.setModel(models, values);
 }
-Creator.prototype.on = on;
-Creator.prototype.reset = reset;
-Creator.prototype.get = get;
-Creator.prototype.set = set;
-Creator.prototype.value = value;
-Creator.prototype.json = json;
-Creator.prototype.model = model;
+
+Creator.prototype.error = function defineError(name, message) {
+  var errMsg = (window.DEV ? "".concat(this.name, ".").concat(name, ": ") : '') + message;
+  return new Error(errMsg);
+};
 /**
- * 监听表单某字段变化
- * @param {string} name 字段名称
- * @param {function} func 监听函数
+ * 清空表单 
  * @public
- * @method
  */
 
-function on(name, func) {
-  if (name in this.fields) {
-    this.fields[name].dispatch = func;
+
+Creator.prototype.reset = function reset(name) {
+  if (this.resetField(name) === true) {
+    return;
   }
-}
-/**
- * 清空表单
- * @param {function?} handle 
- * @public
- * @method
- */
 
-
-function reset(handle) {
   var fields = this.fields;
 
-  for (var name in fields) {
-    var _model = fields[name];
-
-    if (_model.reset === false) {
-      continue;
-    }
-
-    typeof _model.reset === 'function' ? _model.reset(_model) : typeof handle === 'function' ? handle(_model) : _model.value = '';
+  for (var _name in fields) {
+    this.resetField(_name);
   }
-}
+};
+/**
+ * 重置某个字段的值
+ * @param {string} name
+ */
+
+
+Creator.prototype.resetField = function resetField(name) {
+  if (!objectHas(this.fields, name)) {
+    return false;
+  }
+
+  var model = this.fields[name];
+
+  if (model.reset === false) {
+    return false;
+  }
+
+  if (typeof model.reset === 'function') {
+    model.reset(model, this.fields);
+    return true;
+  }
+
+  model.value = '';
+  return true;
+};
 /**
  * 获取表单指定字段的值
  * @param {string} name 字段名称
- * @public
- * @method
  */
 
 
-function get(name) {
-  return name in this.fields ? this.fields[name].value : void 0;
-}
+Creator.prototype.get = function getFieldValue(name) {
+  return objectHas(this.fields, name) ? this.fields[name].value : '';
+};
 /**
  * 设置指定表单字段的值
  * @param {string} name 表单字段名
  * @param {*} value 指定值
- * @public
- * @method
  */
 
 
-function set(name, value) {
-  name in this.fields ? this.fields[name].value = value : void 0;
-}
+Creator.prototype.set = function setFieldValue(name, value) {
+  objectHas(this.fields, name) && (this.fields[name].value = value);
+};
 /**
  * 表单字段model设置
  * @param {object} models 
@@ -92,99 +100,93 @@ function set(name, value) {
  */
 
 
-function model(models, values) {
+Creator.prototype.setModel = function setModel(models, values) {
   models = models && _typeof(models) === 'object' ? models : {};
   values = values && _typeof(values) === 'object' ? values : {};
 
   for (var name in models) {
-    this.fields[name] = new Model(models[name], values[name]);
-  }
-}
-/**
- * 表单字段赋值
- * @param {object} values 字段值集合
- * @public
- * @method
- */
-
-
-function value(values) {
-  values = _typeof(values) === 'object' ? values : {};
-  var fields = this.fields;
-
-  for (var name in values) {
-    var _value = values[name];
-
-    if (name in fields) {
-      fields[name].value = _value;
+    if (objectHas(models, name)) {
+      this.fields[name] = new Model(models[name], values[name]);
     }
   }
-}
+};
 /**
- * 表单字段值json
- * @param {Function?} reset 在json化之后的是否执行reset或reset的函数
+ * 表单字段model设置
+ * @param {object} models 
+ * @param {object} values 
  * @public
  * @method
- * @returns {Object} 表单字段组成的 json
  */
 
 
-function json(reset) {
+Creator.prototype.setValue = function setValue(values) {
+  values = values && _typeof(values) === 'object' ? values : {};
+
+  for (var name in values) {
+    if (objectHas(values, name) && objectHas(models, name)) {
+      this.fields[name].value = values[name];
+    }
+  }
+};
+/**
+ * 校验指定字段
+ * @param {string} name - 字段名
+ * @returns {string} 返回字段值
+ */
+
+
+Creator.prototype.checkField = function (name) {
+  if (!objectHas(this.fields, name)) {
+    throw this.error(name, ' does not exist');
+  }
+
+  var _this$fields$name = this.fields[name],
+      required = _this$fields$name.required,
+      validate = _this$fields$name.validate,
+      message = _this$fields$name.message,
+      placeholder = _this$fields$name.placeholder,
+      value = _this$fields$name.value;
+  var errMsg = message || placeholder || 'is required.';
+
+  if (required === true && (value == null || getLength(value) === 0)) {
+    throw this.error(name, errMsg);
+  }
+
+  if (validate instanceof RegExp && !validate.test(value)) {
+    throw this.error(name, errMsg);
+  }
+
+  if (typeof validate === 'function') {
+    var ret = validate(value, this);
+
+    if (ret === false) {
+      throw this.error(name, errMsg);
+    }
+
+    if (typeof ret === 'string' || ret instanceof Error) {
+      throw this.error(name, ret);
+    }
+  }
+
+  return value;
+};
+/**
+ * 表单字段值json 
+ * @returns {Object} 表单字段值组成的 json 
+ */
+
+
+Creator.prototype.json = function toJson(reset) {
   var json = {};
   var fields = this.fields;
 
   for (var name in fields) {
-    json[name] = modelValidate(name, fields[name], this);
+    json[name] = this.checkField(name);
   }
 
-  reset && this.reset(reset);
+  !!reset && this.reset(reset);
   return json;
-}
-
-function modelValidate(name, model, ctx) {
-  var value = model.value,
-      required = model.required,
-      validate = model.validate,
-      message = model.message,
-      placeholder = model.placeholder;
-
-  if (!required && !validate) {
-    return value;
-  }
-
-  try {
-    var errMsg = message || placeholder || ' Invalid value.';
-
-    if (typeof value === 'undefined') {
-      throw new Error(errMsg);
-    }
-
-    if (validate instanceof RegExp && !validate.test(value)) {
-      throw new Error(errMsg);
-    }
-
-    if (typeof validate === 'function') {
-      var ret = validate(value, ctx);
-
-      if (typeof ret === 'string') {
-        throw new Error(ret);
-      }
-
-      if (ret === false) {
-        throw new Error(errMsg);
-      }
-
-      if (ret instanceof Error) {
-        throw ret;
-      }
-    }
-  } catch (error) {
-    error.message = '[' + name + '] ' + error.message;
-    throw error;
-  }
-
-  return value;
-}
+};
 
 var Item = function Item(props) {
   if (!props.show) return null;
@@ -305,11 +307,12 @@ Form.propTypes = {
  * 数据流管理
  * @param {Model} models 字段模型 ...
  * @param {object} values 字段值集合
+ * @param {string} formName 表单字段的名称
  * @returns {Creator} 
  */
 
-function create(models, values) {
-  return new Creator(models, values);
+function create(models, values, formName) {
+  return new Creator(models, values, formName);
 }
 /**
  * 数据流管理

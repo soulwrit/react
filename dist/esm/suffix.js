@@ -5,8 +5,9 @@ import { c as classnames } from './index-dc594463.js';
 import { a as assert_1 } from './assert-cc694573.js';
 import { r as raf } from './raf-4503f6a0.js';
 import { c as contains } from './dom-contains-5179471e.js';
-import './css-animate-93e47d39.js';
-import { C as CSSMotion } from './CSSMotion-f1b5afe8.js';
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
+import './css-animate-4c1feb1b.js';
+import { C as CSSMotion } from './CSSMotion-cdce7961.js';
 
 /**
  * 指定的对象`obj`是否为window对象
@@ -197,7 +198,7 @@ var Suffix = function Suffix(props) {
     visible: visible
   }, /*#__PURE__*/React__default.createElement('div', {
     style: Object.assign({
-      zIndex: zIndex
+      zIndex: zIndex || getZIndex()
     }, style),
     className: classnames('suf', className, {
       non: !visible

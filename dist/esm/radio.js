@@ -3,7 +3,7 @@ import React__default, { useState, useEffect } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil } from './dependency-8ea69cb4.js';
-import { M as Model } from './Model-6a5cfb7c.js';
+import { M as Model, w as watchModel } from './Model-6d1c225d.js';
 
 var Radio = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
   var children = props.children,
@@ -61,14 +61,10 @@ var Group = function Group(props) {
       };
 
       if (model) {
-        model.dispatch = modelDispatch;
+        watchModel(model, modelDispatch);
       }
 
-      return function () {
-        if (model) {
-          model.undispatch = modelDispatch;
-        }
-      };
+      return function () {};
     }, []);
   }
 

@@ -3,12 +3,13 @@ import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil, M as MQ_Breakpoints, t as theme } from './dependency-8ea69cb4.js';
+import { a as assert_1 } from './assert-cc694573.js';
 import './object-has-own-6b83c90b.js';
 import ReactDOM from 'react-dom';
-import { a as assert_1 } from './assert-cc694573.js';
 import './raf-4503f6a0.js';
 import './dom-contains-5179471e.js';
-import { T as Trigger } from './Trigger-84efcddb.js';
+import { T as Trigger } from './Trigger-15f31aa8.js';
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
 
 var RefBox = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
   var type = props.type,
@@ -167,14 +168,6 @@ function Tooltip(props) {
     calcCoord: calcCoord,
     visible: visible
   }, function (action) {
-    /*
-       close: this.onClose,
-       open: this.onOpen,
-       coord: this.state.coord,
-       visible: this.state.visible,
-       layer: this.layerRef,
-       trigger: this.pointRef,
-    */
     var bindEvent = function bindEvent(props, nextProps) {
       if (hoverable) {
         nextProps.onMouseEnter = props.onMouseEnter ? function (e) {
@@ -212,7 +205,9 @@ function Tooltip(props) {
     }), action.visible ? /*#__PURE__*/ReactDOM.createPortal( /*#__PURE__*/React__default.createElement('div', {
       className: classnames(CSSUtil.tooltips, size, theme, placement, className),
       ref: action.layer,
-      style: Object.assign({}, action.coord, style)
+      style: Object.assign({
+        zIndex: getZIndex()
+      }, action.coord, style)
     }, /*#__PURE__*/React__default.createElement('div', {
       className: 'arrow'
     }), /*#__PURE__*/React__default.createElement('div', {
@@ -234,12 +229,13 @@ Tooltip.defaultProps = {
 if (window.DEV) {
   Tooltip.propTypes = {
     children: propTypes.any.isRequired,
-    style: propTypes.object,
+    hoverable: propTypes.bool,
+    onClick: propTypes.func,
     size: propTypes.oneOf(MQ_Breakpoints),
-    theme: propTypes.oneOf(theme),
+    style: propTypes.object,
     title: propTypes.any,
-    visible: propTypes.bool,
-    hoverable: propTypes.bool
+    theme: propTypes.oneOf(theme),
+    visible: propTypes.bool
   };
 }
 

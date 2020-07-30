@@ -1,20 +1,22 @@
 import { f as _slicedToArray } from './_rollupPluginBabelHelpers-62f9ecef.js';
-import React__default, { useState } from 'react';
+import React__default, { useState, useRef } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { C as CSSUtil } from './dependency-8ea69cb4.js';
+import './assert-cc694573.js';
 import './noop-469b0e21.js';
 import './object-has-own-6b83c90b.js';
-import './Model-6a5cfb7c.js';
+import './Model-6d1c225d.js';
 import { Input } from './input.js';
 import { Pager } from './pager.js';
 import 'react-dom';
-import './assert-cc694573.js';
 import './raf-4503f6a0.js';
 import './dom-contains-5179471e.js';
-import './Trigger-84efcddb.js';
+import './Trigger-15f31aa8.js';
 import { DropdownItem, Dropdown, DropdownHead } from './dropdown.js';
+import './dom-viewport-width-59a780a1.js';
 import './dom-viewport-height-640d289b.js';
+import './zIndex-bd9d5e3e.js';
 
 /**
  * @example 
@@ -35,6 +37,7 @@ var AutoComplete = function AutoComplete(props) {
       fetch = props.fetch,
       filter = props.filter,
       itemClassName = props.itemClassName,
+      model = props.model,
       pageNo = props.pageNo,
       pageSize = props.pageSize,
       placeholder = props.placeholder,
@@ -42,7 +45,6 @@ var AutoComplete = function AutoComplete(props) {
       valueKey = props.valueKey;
   var initialValues = props.values;
   var initialValue = props.value;
-  var tmpValues;
 
   var _useState = useState(pageNo),
       _useState2 = _slicedToArray(_useState, 2),
@@ -53,6 +55,8 @@ var AutoComplete = function AutoComplete(props) {
       _useState4 = _slicedToArray(_useState3, 2),
       pageOffset = _useState4[0],
       setPageOffset = _useState4[1];
+
+  var tmpValues = useRef();
 
   var limit = function limit(array) {
     return array.slice((pageIndex - 1) * pageOffset, pageIndex * pageOffset);
@@ -104,7 +108,7 @@ var AutoComplete = function AutoComplete(props) {
       return filter(obj[valueKey], value);
     }) : initialValues;
     setPageIndex(1);
-    tmpValues = array;
+    tmpValues.current = array;
     setValue(value);
     setVisible(visible);
     setTotal(array.length);
@@ -129,7 +133,7 @@ var AutoComplete = function AutoComplete(props) {
     setPageIndex(no);
     setPageOffset(size);
     if (getData()) return;
-    var array = tmpValues || initialValues;
+    var array = tmpValues.current || initialValues;
     setTotal(array.length);
     setValues(limit(array));
   };
@@ -172,7 +176,8 @@ var AutoComplete = function AutoComplete(props) {
     onChange: onChange,
     onClick: onVisible,
     placeholder: placeholder,
-    value: value
+    value: value,
+    model: model
   }))), items);
 };
 

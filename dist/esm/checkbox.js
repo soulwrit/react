@@ -24,7 +24,7 @@ function Model(model, value) {
     "default": model
   };
   this._value = value || model["default"];
-  this._dispatch = [];
+  this._dispatch = null;
   this.label = model.label;
   this.message = model.message;
   this.placeholder = model.placeholder;
@@ -38,38 +38,44 @@ function Model(model, value) {
       },
       set: function set(value) {
         this._value = value;
-
-        this._dispatch.forEach(function (dispatch) {
-          return dispatch(value);
-        });
+        this.dispatch();
       }
     },
-    dispatch: {
-      set: function set(fn) {
-        if (typeof fn !== 'function') {
-          throw new Error('Model dispatch must be a function.');
-        }
-
-        if (this._dispatch.indexOf(fn) === -1) {
-          this._dispatch.push(fn);
-        }
-      }
-    },
-    undispatch: {
-      set: function set(fn) {
-        var index = this._dispatch.indexOf(fn);
-
-        if (index > -1) {
-          this._dispatch.splice(index, 1);
-        }
-      }
-    },
-    size: {
+    length: {
       get: function get() {
-        return (typeof this._value === 'undefined' ? '' : this._value).toString().length;
+        return this._value != null ? this._value.toString().length : 0;
       }
     }
   });
+}
+
+Model.prototype.dispatch = function updateValue() {
+  if (this._dispatch == null) return;
+
+  this._dispatch(this._value);
+};
+
+Model.prototype.watch = function listenValue(dispatch) {
+  this._dispatch = dispatch;
+};
+/**
+ * 安装 state 到 model
+ * @param {Model} model 
+ * @param {function} dispatch 
+ */
+
+var watchModel = function watchModel(model, dispatch, value) {
+  if (!isValidModel(model) || typeof dispatch !== 'function') return;
+  model._value = value;
+  model.watch(dispatch);
+};
+/**
+ * 是否为 Model
+ * @param {Model} model 
+ */
+
+function isValidModel(model) {
+  return model instanceof Model;
 }
 
 var Group = function Group(props) {
@@ -84,7 +90,7 @@ var Group = function Group(props) {
       setChecked = _useState2[1];
 
   if (model) {
-    model.dispatch = setChecked;
+    watchModel(model, setChecked);
   }
 
   return React__default.Children.map(children, function (Item, index) {

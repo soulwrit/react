@@ -5,7 +5,7 @@ import { c as classnames } from './index-dc594463.js';
 import { M as MQ_Breakpoints, t as theme, C as CSSUtil } from './dependency-8ea69cb4.js';
 import { n as noop_1 } from './noop-469b0e21.js';
 import { o as objectHasOwn } from './object-has-own-6b83c90b.js';
-import { M as Model } from './Model-6a5cfb7c.js';
+import { M as Model, u as updateModel, w as watchModel } from './Model-6d1c225d.js';
 
 var CssFloat = function CssFloat(props) {
   var children = props.children,
@@ -44,6 +44,14 @@ var NativeInput = /*#__PURE__*/React__default.forwardRef(function (_ref, ref) {
   }));
 });
 
+var rmPwdValue = function rmPwdValue(type, el) {
+  if (type === 'password') {
+    if (el.hasAttribute('value')) {
+      el.removeAttribute('value');
+    }
+  }
+};
+
 var Wrapper = /*#__PURE__*/function (_React$Component) {
   _inherits(Wrapper, _React$Component);
 
@@ -79,47 +87,31 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
       return _this.input = ele;
     });
 
-    _defineProperty(_assertThisInitialized(_this), "rmPwdValue", function () {
-      if (_this.props.type === 'password') {
-        var t = setTimeout(function () {
-          clearTimeout(t);
-
-          if (_this.input.hasAttribute('value')) {
-            _this.input.removeAttribute('value');
-          }
-        });
-      }
-    });
-
     _defineProperty(_assertThisInitialized(_this), "setValue", function (value) {
       _this.setState({
         value: value
       }, function () {
+        rmPwdValue(_this.props.type, _this.input);
+
         _this.input.focus();
 
-        _this.rmPwdValue();
+        _this.props.onChange(value);
       });
     });
 
     _defineProperty(_assertThisInitialized(_this), "onChange", function (e) {
       var value = e.target.value;
-      var _this$props = _this.props,
-          model = _this$props.model,
-          onChange = _this$props.onChange;
 
-      if (model) {
-        model.value = value;
-      } else {
-        _this.setValue(value);
+      if (updateModel(_this.props.model, value)) {
+        return;
       }
 
-      onChange(value);
+      _this.setValue(value);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onBlur", function (e) {
       var onBlur = _this.props.onBlur;
-
-      _this.rmPwdValue();
+      rmPwdValue(_this.props.type, _this.input);
 
       if (onBlur) {
         onBlur(e);
@@ -135,9 +127,9 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "onKeyDown", function (e) {
-      var _this$props2 = _this.props,
-          onKeyDown = _this$props2.onKeyDown,
-          onEnter = _this$props2.onEnter;
+      var _this$props = _this.props,
+          onKeyDown = _this$props.onKeyDown,
+          onEnter = _this$props.onEnter;
 
       if (e.keyCode === 13 && onEnter) {
         if (onEnter(e)) return;
@@ -149,25 +141,21 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "onReset", function () {
+      if (updateModel(_this.props.model, '')) {
+        return;
+      }
+
       _this.setValue('');
     });
 
-    var _model = props.model,
+    var model = props.model,
         _value = props.value;
-    var prior = _value;
-
-    if (_model) {
-      prior = _model.value;
-
-      _model.dispatch = function (value) {
-        _this.setValue(value);
-      };
-    }
-
+    var prior = model ? model.value : _value;
     _this.state = {
-      value: prior
+      value: prior || ''
     };
-    _this.prior = prior;
+    _this.input = null;
+    watchModel(model, _this.setValue, prior);
     return _this;
   }
 
@@ -178,12 +166,9 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      var value = this.state.value;
-
-      if (value != null && this.prior != value) {
-        this.input.value = value;
-        this.prior = value;
+    value: function componentDidUpdate(props) {
+      if (props.model !== this.props.model) {
+        watchModel(this.props.model, this.setValue, this.state.value);
       }
     }
   }, {
@@ -198,20 +183,21 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this$props3 = this.props,
-          className = _this$props3.className,
-          multiple = _this$props3.multiple,
-          placeholder = _this$props3.placeholder,
-          prefix = _this$props3.prefix,
-          resize = _this$props3.resize,
-          style = _this$props3.style,
-          size = _this$props3.size,
-          suffix = _this$props3.suffix,
-          theme = _this$props3.theme,
-          model = _this$props3.model,
-          width = _this$props3.width,
-          wrapper = _this$props3.wrapper,
-          rest = _objectWithoutProperties(_this$props3, ["className", "multiple", "placeholder", "prefix", "resize", "style", "size", "suffix", "theme", "model", "width", "wrapper"]);
+      var _this$props2 = this.props,
+          className = _this$props2.className,
+          inf = _this$props2.inf,
+          multiple = _this$props2.multiple,
+          placeholder = _this$props2.placeholder,
+          prefix = _this$props2.prefix,
+          resize = _this$props2.resize,
+          style = _this$props2.style,
+          size = _this$props2.size,
+          suffix = _this$props2.suffix,
+          theme = _this$props2.theme,
+          model = _this$props2.model,
+          width = _this$props2.width,
+          wrapper = _this$props2.wrapper,
+          rest = _objectWithoutProperties(_this$props2, ["className", "inf", "multiple", "placeholder", "prefix", "resize", "style", "size", "suffix", "theme", "model", "width", "wrapper"]);
 
       var value = this.state.value;
       var styled = Object.assign({
@@ -239,22 +225,27 @@ var Wrapper = /*#__PURE__*/function (_React$Component) {
       inputProps.style = Object.assign({
         resize: resize
       }, inputProps.style);
+      var length = value.length;
       var prefixElement = typeof prefix === 'function' ? prefix({
         reset: this.onReset,
         setValue: this.setValue,
-        className: size
+        className: size,
+        length: length
       }) : /*#__PURE__*/React__default.createElement(CssFloat, {
         className: size
       }, prefix);
-      var suffixElement = typeof suffix === 'function' ? prefix({
+      var suffixElement = typeof suffix === 'function' ? suffix({
         reset: this.onReset,
         setValue: this.setValue,
-        className: size
+        className: size,
+        length: length
       }) : /*#__PURE__*/React__default.createElement(CssFloat, {
         className: size
       }, suffix);
       return /*#__PURE__*/React__default.createElement(wrapper, {
-        className: classnames(CSSUtil.input, theme, className),
+        className: classnames(CSSUtil.input, theme, {
+          inf: inf
+        }, className),
         style: styled
       }, prefixElement, /*#__PURE__*/React__default.createElement(CssFloat, null, /*#__PURE__*/React__default.createElement(NativeInput, inputProps)), suffixElement);
     }
@@ -268,7 +259,8 @@ Wrapper.defaultProps = {
   theme: 'muted',
   width: '100%',
   wrapper: 'span',
-  placeholder: 'Enter to here'
+  placeholder: 'Enter to here',
+  inf: true
 };
 
 if (window.DEV) {
@@ -285,8 +277,7 @@ if (window.DEV) {
     size: propTypes.oneOf(MQ_Breakpoints),
     suffix: propTypes.oneOfType([propTypes.any, propTypes.func]),
     theme: propTypes.oneOf(theme),
-    width: propTypes.oneOfType([propTypes.string, propTypes.number]),
-    input: propTypes.object
+    width: propTypes.oneOfType([propTypes.string, propTypes.number])
   };
 }
 

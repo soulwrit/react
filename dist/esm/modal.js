@@ -3,12 +3,13 @@ import React__default, { useRef, useState, useCallback, useEffect } from 'react'
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { p as placements, C as CSSUtil, t as theme } from './dependency-8ea69cb4.js';
+import { a as assert_1 } from './assert-cc694573.js';
 import { o as objectHasOwn } from './object-has-own-6b83c90b.js';
 import ReactDOM from 'react-dom';
-import { a as assert_1 } from './assert-cc694573.js';
 import './raf-4503f6a0.js';
-import './css-animate-93e47d39.js';
-import { C as CSSMotion } from './CSSMotion-f1b5afe8.js';
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
+import './css-animate-4c1feb1b.js';
+import { C as CSSMotion } from './CSSMotion-cdce7961.js';
 import { Mask } from './mask.js';
 
 var Modal = function Modal(props) {
@@ -91,7 +92,8 @@ var Modal = function Modal(props) {
     onClose: maskClosable ? onCloseWrapper : null,
     style: maskStyle,
     times: 0,
-    visible: shown
+    visible: shown,
+    zIndex: getZIndex()
   }) : null, /*#__PURE__*/React__default.createElement(CSSMotion, {
     active: position,
     key: 'body',
@@ -106,7 +108,8 @@ var Modal = function Modal(props) {
     ref: modalRef,
     style: Object.assign({
       width: width,
-      height: height
+      height: height,
+      zIndex: getZIndex()
     }, style)
   }, title && /*#__PURE__*/React__default.createElement('div', {
     className: classnames('hd', size, theme, headerClassName),

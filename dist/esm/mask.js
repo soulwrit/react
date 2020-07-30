@@ -4,8 +4,9 @@ import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import ReactDOM from 'react-dom';
 import './raf-4503f6a0.js';
-import './css-animate-93e47d39.js';
-import { C as CSSMotion } from './CSSMotion-f1b5afe8.js';
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
+import './css-animate-4c1feb1b.js';
+import { C as CSSMotion } from './CSSMotion-cdce7961.js';
 
 /**
  * 这是一个受控组件，visible 由 props 完全控制
@@ -21,30 +22,27 @@ var Mask = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
       onClose = props.onClose,
       style = props.style,
       times = props.times,
-      visible = props.visible;
+      visible = props.visible,
+      zIndex = props.zIndex;
+  useEffect(function () {
+    var onCloseEsc = function onCloseEsc(e) {
+      if (!visible) return;
 
-  if (escOut) {
-    useEffect(function () {
-      var onCloseEsc = function onCloseEsc(e) {
-        if (!visible) return;
-
-        if ((e.key || '').toLowerCase() == 'escape' || e.keyCode === 9) {
-          onClose();
-        }
-      };
-
-      if (onClose) {
-        document.body.addEventListener('keyup', onCloseEsc, false);
+      if ((e.key || '').toLowerCase() == 'escape' || e.keyCode === 27) {
+        onClose();
       }
+    };
 
-      return function () {
-        if (onClose) {
-          document.body.removeEventListener('keyup', onCloseEsc);
-        }
-      };
-    }, [visible]);
-  }
+    if (onClose) {
+      document.body.addEventListener('keyup', onCloseEsc, false);
+    }
 
+    return function () {
+      if (onClose) {
+        document.body.removeEventListener('keyup', onCloseEsc);
+      }
+    };
+  }, [visible, escOut]);
   var maskElement = /*#__PURE__*/React__default.createElement(CSSMotion, {
     active: 'fade',
     offset: 'in',
@@ -72,7 +70,9 @@ var Mask = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
     }, children)],
     onClick: thisOut ? onClose : null,
     ref: maskRef,
-    style: style
+    style: Object.assign({
+      zIndex: zIndex || getZIndex()
+    }, style)
   }));
   return global ? /*#__PURE__*/ReactDOM.createPortal(maskElement, document.body) : maskElement;
 });

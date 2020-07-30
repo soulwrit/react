@@ -1,43 +1,16 @@
-import { f as _slicedToArray, i as _typeof, a as _inherits, b as _createSuper, d as _classCallCheck, c as _createClass } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import { i as _typeof, f as _slicedToArray, a as _inherits, b as _createSuper, d as _classCallCheck, c as _createClass } from './_rollupPluginBabelHelpers-62f9ecef.js';
 import React__default, { useRef, useState, useEffect } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
-import { C as CSSUtil, M as MQ_Breakpoints, t as theme } from './dependency-8ea69cb4.js';
+import { M as MQ_Breakpoints, C as CSSUtil, t as theme } from './dependency-8ea69cb4.js';
+import { a as assert_1 } from './assert-cc694573.js';
 import { n as noop_1 } from './noop-469b0e21.js';
 import { o as objectHasOwn } from './object-has-own-6b83c90b.js';
 import ReactDOM from 'react-dom';
-import { a as assert_1 } from './assert-cc694573.js';
 import './raf-4503f6a0.js';
-import './css-animate-93e47d39.js';
-import { C as CSSMotion } from './CSSMotion-f1b5afe8.js';
-
-var cached = new Map();
-function createContainer(position) {
-  if (cached.has(position)) {
-    return cached.get(position);
-  }
-
-  var container = document.createElement('div');
-  var bridge = Object.create(null);
-  container.className = [CSSUtil.toast, position].join(' ');
-  document.body.appendChild(container);
-  cached.set(position, [container, bridge]);
-  return [container, bridge];
-}
-function removeContainer(position) {
-  if (cached.has(position)) {
-    var _cached$get = cached.get(position),
-        _cached$get2 = _slicedToArray(_cached$get, 2),
-        container = _cached$get2[0],
-        bridge = _cached$get2[1];
-
-    document.body.removeChild(container);
-    bridge.instance = null;
-    return cached["delete"](position);
-  }
-
-  assert_1["throw"]('Container does existed, or has be removed.');
-}
+import { g as getZIndex } from './zIndex-bd9d5e3e.js';
+import './css-animate-4c1feb1b.js';
+import { C as CSSAnimation } from './CSSAnimation-14e8fd9b.js';
 
 function getKey() {
   var index = 0;
@@ -53,7 +26,7 @@ var position = ['top-start', 'top', 'top-end', // 'right', 'left', 'middle', 'fa
 'bottom-start', 'bottom', 'bottom-end'];
 var DEFAULT = {
   autoClose: true,
-  duration: 5000,
+  duration: 2000,
   onClose: noop_1,
   position: 'top-end',
   size: 'md',
@@ -104,6 +77,35 @@ var mergeProps = function mergeProps(options, targetObj, hasDefault) {
 
   return target;
 };
+
+var cached = new Map();
+function createContainer(position) {
+  if (cached.has(position)) {
+    return cached.get(position);
+  }
+
+  var container = document.createElement('div');
+  var bridge = Object.create(null);
+  container.className = [CSSUtil.toast, position].join(' ');
+  container.style.zIndex = getZIndex();
+  document.body.appendChild(container);
+  cached.set(position, [container, bridge]);
+  return [container, bridge];
+}
+function removeContainer(position) {
+  if (cached.has(position)) {
+    var _cached$get = cached.get(position),
+        _cached$get2 = _slicedToArray(_cached$get, 2),
+        container = _cached$get2[0],
+        bridge = _cached$get2[1];
+
+    document.body.removeChild(container);
+    bridge.instance = null;
+    return cached["delete"](position);
+  }
+
+  assert_1["throw"]('Container does existed, or has be removed.');
+}
 
 function Queue() {
   assert_1.truly(this instanceof Queue, 'Queue is a constructor, must new.');
@@ -252,28 +254,21 @@ var Toast = function Toast(props) {
       }
     }
   }, [visible]);
-  return /*#__PURE__*/React__default.createElement(CSSMotion, {
-    active: void 0,
-    offset: 'open',
-    display: false,
-    onStart: function onStart() {
-      return true;
+  return /*#__PURE__*/React__default.createElement(CSSAnimation, {
+    onStart: function onStart(elem) {
+      visible ? elem.classList.add('open') : elem.classList.remove('open');
     },
     onEnded: function onEnded() {
-      console.log('Toast isEnter', visible);
-
-      if (visible === false) {
-        if (autoClose) {
-          onClose();
-        }
+      if (visible === false && autoClose) {
+        onClose();
       }
     },
     onRef: function onRef() {
       return toastRef.current;
     },
-    visible: visible
+    flag: visible
   }, /*#__PURE__*/React__default.createElement('div', {
-    className: classnames('wrap', size, type, className),
+    className: classnames('wrapper', size, type, className),
     ref: toastRef,
     onMouseEnter: pause,
     onMouseLeave: restart,
@@ -310,7 +305,6 @@ function toast(content, type, options) {
   props.key = key;
 
   props.onClose = function onEnd() {
-    console.log('Toast Unmount.');
     bridge.instance.remove(element);
     typeof userOnClose === 'function' && userOnClose();
   };
@@ -322,7 +316,7 @@ function toast(content, type, options) {
 
   var element = /*#__PURE__*/React__default.createElement(Toast, props);
 
-  if (objectHasOwn(bridge, 'instance')) {
+  if (objectHasOwn(bridge, 'instance') && bridge.instance != null) {
     bridge.instance.add(element);
   } else {
     ReactDOM.render( /*#__PURE__*/React__default.createElement(Layer, {
@@ -331,7 +325,6 @@ function toast(content, type, options) {
         bridge.instance = instance;
       },
       unmonut: function unmonut() {
-        console.log('Layer Unmount.');
         removeContainer(position);
       }
     }), container);
