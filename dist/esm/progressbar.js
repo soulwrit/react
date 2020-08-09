@@ -1,11 +1,11 @@
-import { f as _slicedToArray, g as _objectWithoutProperties, h as _objectSpread2 } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import { f as _slicedToArray, g as _objectWithoutProperties, h as _objectSpread2 } from './_rollupPluginBabelHelpers-cc1db274.js';
 import React__default, { useState, useEffect } from 'react';
 import './index-c0558b2a.js';
 import './index-dc594463.js';
 import './dependency-8ea69cb4.js';
 import ReactDOM from 'react-dom';
-import { P as ProgressBar } from './ProgressBar-8e1b0faf.js';
-export { P as ProgressBar } from './ProgressBar-8e1b0faf.js';
+import { P as ProgressBar } from './ProgressBar-f802d2a3.js';
+export { P as ProgressBar } from './ProgressBar-f802d2a3.js';
 
 var useProgress = function useProgress(initial, callback) {
   var _useState = useState(initial),
@@ -27,24 +27,7 @@ var useProgress = function useProgress(initial, callback) {
     }
   }, [progress]);
   return [progress, setProgressWrapper];
-}; // export const useBackState = (initial, callback) => {
-//     const [state, setState] = useState(initial);
-//     const setStateWrapper = (nextState, callback) => {
-//         if (typeof callback === 'function') {
-//             // prev state
-//             if (callback(state, nextState) === false) {
-//                 return;
-//             }
-//         }
-//         setState(nextState);
-//     };
-//     useEffect(() => {
-//         if (typeof callback === 'function') {
-//             callback(state);
-//         }
-//     }, [state]);
-//     return [state, setStateWrapper];
-// }
+};
 
 function getProgressSpeedmeter(step, end) {
   var k = step;

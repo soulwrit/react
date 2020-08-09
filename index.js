@@ -14,6 +14,7 @@ export { ColorPicker } from './lib/ColorPicker';
 export { ContextMenu } from './lib/ContextMenu';
 export { Cover } from './lib/Cover';
 export { Confirm } from './lib/Confirm';
+export { Comment } from './lib/Comment';
 export { Crumbs } from './lib/Crumbs';
 export { Drawer } from './lib/Drawer';
 export { Divider } from './lib/Divider';

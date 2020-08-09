@@ -1,4 +1,4 @@
-import { a as _inherits, b as _createSuper, d as _classCallCheck, _ as _defineProperty, e as _assertThisInitialized, c as _createClass } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import { _ as _inherits, a as _createSuper, b as _classCallCheck, c as _defineProperty, d as _assertThisInitialized, e as _createClass } from './_rollupPluginBabelHelpers-cc1db274.js';
 import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
@@ -18,7 +18,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "onCompositionStart", function () {
       _this.setState({
-        show: false
+        visible: false
       });
 
       _this.compositionEnd = false;
@@ -30,7 +30,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "onBlur", function (e) {
       _this.setState({
-        show: _this.isEmpty()
+        visible: _this.isEmpty()
       });
 
       _this.props.onBlur && _this.props.onBlur(e);
@@ -47,9 +47,9 @@ var Editable = /*#__PURE__*/function (_React$Component) {
 
       var isEmpty = _this.isEmpty();
 
-      if (_this.state.show === true || isEmpty) {
+      if (_this.state.visible === true || isEmpty) {
         _this.setState({
-          show: isEmpty
+          visible: isEmpty
         });
       }
 
@@ -70,7 +70,7 @@ var Editable = /*#__PURE__*/function (_React$Component) {
     _this.compositionEnd = true;
     _this.value = props.value;
     _this.state = {
-      show: _this.isEmpty()
+      visible: _this.isEmpty()
     };
     return _this;
   }
@@ -95,12 +95,19 @@ var Editable = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      var props = this.props;
+      var _this$props = this.props,
+          className = _this$props.className,
+          onKeyDown = _this$props.onKeyDown,
+          placeholder = _this$props.placeholder,
+          size = _this$props.size,
+          style = _this$props.style,
+          theme = _this$props.theme;
+      var visible = this.state.visible;
       return /*#__PURE__*/React__default.createElement('div', {
-        className: classnames(CSSUtil.editable, props.className),
+        className: classnames(CSSUtil.editable, className),
         children: [/*#__PURE__*/React__default.createElement('div', {
           key: 0,
-          className: classnames('i', props.theme, props.size),
+          className: classnames('i', theme, size),
           contentEditable: this.editabled(),
           onCompositionStart: this.onCompositionStart,
           onCompositionEnd: this.onCompositionEnd,
@@ -108,17 +115,17 @@ var Editable = /*#__PURE__*/function (_React$Component) {
           onFocus: this.onFocus,
           onInput: this.onInput,
           onKeyUp: this.onKeyUp,
-          onKeyDown: props.onKeyDown,
+          onKeyDown: onKeyDown,
           ref: function ref(ele) {
             return _this2.element = ele;
           }
-        }), this.state.show ? /*#__PURE__*/React__default.createElement('div', {
+        }), visible ? /*#__PURE__*/React__default.createElement('div', {
           key: 1,
-          className: classnames('placeholder', props.size),
-          children: props.placeholder,
+          className: classnames('placeholder', size),
+          children: placeholder,
           onClick: this.onFocus
         }) : null],
-        style: props.style
+        style: style
       });
     }
   }]);
@@ -146,7 +153,7 @@ if (window.DEV) {
     onInput: propTypes.func,
     onKeyUp: propTypes.func,
     onKeyDown: propTypes.func,
-    placeholder: propTypes.string,
+    placeholder: propTypes.any,
     readonly: propTypes.bool,
     size: propTypes.oneOf(MQ_Breakpoints),
     theme: propTypes.oneOf(theme),

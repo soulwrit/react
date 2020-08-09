@@ -1,4 +1,4 @@
-import { a as _inherits, b as _createSuper, d as _classCallCheck, c as _createClass } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import { _ as _inherits, a as _createSuper, b as _classCallCheck, e as _createClass } from './_rollupPluginBabelHelpers-cc1db274.js';
 import React__default from 'react';
 
 var ErrorBoundary = /*#__PURE__*/function (_React$Component) {

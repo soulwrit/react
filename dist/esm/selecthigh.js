@@ -1,10 +1,10 @@
-import { a as _inherits, b as _createSuper, d as _classCallCheck, _ as _defineProperty, e as _assertThisInitialized, c as _createClass, i as _typeof, h as _objectSpread2 } from './_rollupPluginBabelHelpers-62f9ecef.js';
+import { _ as _inherits, a as _createSuper, b as _classCallCheck, c as _defineProperty, d as _assertThisInitialized, e as _createClass, i as _typeof, h as _objectSpread2 } from './_rollupPluginBabelHelpers-cc1db274.js';
 import React__default from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { t as theme, C as CSSUtil } from './dependency-8ea69cb4.js';
 import './noop-469b0e21.js';
-import { M as Model } from './Model-6d1c225d.js';
+import { M as Model } from './Model-51346cf8.js';
 import { r as raf } from './raf-4503f6a0.js';
 import { PageTurn } from './pageturn.js';
 import { Tag } from './tag.js';

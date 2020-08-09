@@ -1,6 +1,6 @@
 export { version } from './_config.js';
-import { _ as _defineProperty, a as _inherits, b as _createSuper, c as _createClass, d as _classCallCheck, e as _assertThisInitialized } from './_rollupPluginBabelHelpers-62f9ecef.js';
-import React__default, { useRef } from 'react';
+import { _ as _inherits, a as _createSuper, b as _classCallCheck, c as _defineProperty, d as _assertThisInitialized, e as _createClass } from './_rollupPluginBabelHelpers-cc1db274.js';
+import React__default, { memo, createElement, useRef } from 'react';
 import { p as propTypes } from './index-c0558b2a.js';
 import { c as classnames } from './index-dc594463.js';
 import { d as dirs, M as MQ_Breakpoints } from './dependency-8ea69cb4.js';
@@ -10,18 +10,19 @@ import { a as assert_1 } from './assert-cc694573.js';
 export { Accordion } from './accordion.js';
 import './noop-469b0e21.js';
 import { o as objectHasOwn } from './object-has-own-6b83c90b.js';
-import './Model-6d1c225d.js';
+import './Model-51346cf8.js';
 export { Input } from './input.js';
 export { Pager } from './pager.js';
 import 'react-dom';
 import './raf-4503f6a0.js';
 import './dom-contains-5179471e.js';
-import './Trigger-15f31aa8.js';
+import './Trigger-efc78ddb.js';
 export { Dropdown } from './dropdown.js';
 import './dom-viewport-width-59a780a1.js';
 import './dom-viewport-height-640d289b.js';
 import './zIndex-bd9d5e3e.js';
 export { AutoComplete } from './autocomplete.js';
+import { Button } from './button.js';
 export { Button } from './button.js';
 import './percentage-d3aa3789.js';
 export { Box } from './box.js';
@@ -36,10 +37,11 @@ import { C as CSSMotion } from './CSSMotion-cdce7961.js';
 export { Mask } from './mask.js';
 export { Modal } from './modal.js';
 export { Confirm } from './confirm.js';
+import { Editable } from './editable.js';
+export { Editable } from './editable.js';
 export { Crumbs } from './crumbs.js';
 export { Drawer } from './drawer.js';
 export { Divider } from './divider.js';
-export { Editable } from './editable.js';
 import './assert-console-9d788aa1.js';
 export { ElegantEditor } from './eleganteditor.js';
 export { ErrorBoundary } from './errorboundary.js';
@@ -51,27 +53,27 @@ export { Icon } from './icon.js';
 export { a as IconDownload, b as IconImage, S as IconUpload } from './image-2de4c9b4.js';
 export { S as IconInbox } from './inbox-1d5b5e62.js';
 export { S as IconFile } from './file-f15f9b54.js';
-export { I as InputFile } from './InputFile-4e4a9766.js';
+export { I as InputFile } from './InputFile-350b4ab8.js';
 export { InputNumber } from './inputnumber.js';
 export { List } from './list.js';
 export { Loading } from './loading.js';
 export { Menu } from './menu.js';
 import { LineBar } from './linebar.js';
 export { PageTurn } from './pageturn.js';
-export { P as ProgressBar } from './ProgressBar-8e1b0faf.js';
+export { P as ProgressBar } from './ProgressBar-f802d2a3.js';
 export { getCommonProgressBar } from './progressbar.js';
 export { Radio } from './radio.js';
 export { Scrollor } from './scrollor.js';
-import { h as hashCreator } from './Select-d2909e1a.js';
-export { S as Select } from './Select-d2909e1a.js';
+import { h as hashCreator } from './Select-d6689e2a.js';
+export { S as Select } from './Select-d6689e2a.js';
 export { Tag } from './tag.js';
 export { SelectHigh } from './selecthigh.js';
 export { Slot, SlotProvider } from './slot.js';
 export { Suffix } from './suffix.js';
 import './CSSAnimation-14e8fd9b.js';
 export { Switch } from './switch.js';
-import { T as Tab, I as Item, P as Pane, C as Content } from './Tab-a93c1e9d.js';
-export { a as Tabs } from './Tab-a93c1e9d.js';
+import { T as Tab, I as Item, P as Pane, C as Content } from './Tab-bd3a7df5.js';
+export { a as Tabs } from './Tab-bd3a7df5.js';
 export { Table } from './table.js';
 export { Text } from './text.js';
 export { toast } from './toast.js';
@@ -81,6 +83,128 @@ export { TreeMeta, TreeNode, TreeView } from './tree.js';
 export { alert, confirm, prompt } from './utils.js';
 import './Context-2b6bec3a.js';
 export { ViewArea, ViewBox, ViewLink } from './viewbox.js';
+
+var CommentEnter = /*#__PURE__*/function (_React$Component) {
+  _inherits(CommentEnter, _React$Component);
+
+  var _super = _createSuper(CommentEnter);
+
+  function CommentEnter(props) {
+    var _this;
+
+    _classCallCheck(this, CommentEnter);
+
+    _this = _super.call(this);
+
+    _defineProperty(_assertThisInitialized(_this), "onSubmit", function () {
+      _this.props.onSubmit(_this.state.value);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "onChange", function (value) {
+      _this.setState({
+        value: value
+      });
+
+      if (_this.props.onChange) {
+        _this.props.onChange(value);
+      }
+    });
+
+    _this.state = {
+      value: props.value
+    };
+    return _this;
+  } // 提交
+
+
+  _createClass(CommentEnter, [{
+    key: "stat",
+    // 输入字数统计
+    value: function stat() {
+      var isOk = this.state.diffSize > 0;
+      var hasText = this.state.size > 0;
+      return hasText ? isOk ? /*#__PURE__*/React__default.createElement("span", {
+        className: "cmt-num"
+      }, "\u8FD8\u53EF\u4EE5\u8F93\u5165", this.state.diffSize, "\u4E2A\u5B57") : /*#__PURE__*/React__default.createElement("span", {
+        className: "cmt-red"
+      }, "\u5DF2\u7ECF\u8D85\u51FA", Math.abs(this.state.diffSize), "\u4E2A\u5B57") : null;
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          className = _this$props.className,
+          children = _this$props.children,
+          disabled = _this$props.disabled,
+          maxLength = _this$props.maxLength,
+          minLength = _this$props.minLength,
+          placeholder = _this$props.placeholder,
+          readonly = _this$props.readonly,
+          size = _this$props.size,
+          theme = _this$props.theme,
+          value = _this$props.value;
+      return /*#__PURE__*/React__default.createElement("div", {
+        className: classnames('comment', className)
+      }, /*#__PURE__*/React__default.createElement("div", {
+        className: "hd"
+      }), /*#__PURE__*/React__default.createElement("div", {
+        className: "bd"
+      }, /*#__PURE__*/React__default.createElement(Editable, {
+        disabled: disabled,
+        maxLength: maxLength,
+        minLength: minLength,
+        onChange: this.onChange,
+        placeholder: placeholder,
+        readonly: readonly,
+        size: size,
+        theme: theme,
+        value: value
+      })), /*#__PURE__*/React__default.createElement("div", {
+        className: "ft"
+      }, /*#__PURE__*/React__default.createElement("div", {
+        className: "side"
+      }, this.stat()), /*#__PURE__*/React__default.createElement("div", {
+        className: "aside"
+      }, /*#__PURE__*/React__default.createElement(Button, {
+        onClick: this.onSubmit,
+        theme: theme,
+        size: size,
+        disabled: disabled
+      }, "\u53D1\u5E03"))), children);
+    }
+  }]);
+
+  return CommentEnter;
+}(React__default.Component);
+CommentEnter.defaultProps = {
+  maxLength: 500,
+  minLength: 0,
+  onChange: undefined,
+  onSubmit: undefined,
+  size: 'md'
+};
+
+if (window.DEV) {
+  CommentEnter.propTypes = {
+    onChange: propTypes.func,
+    onSubmit: propTypes.func,
+    size: Editable.propTypes.size
+  };
+}
+
+var Comment = /*#__PURE__*/memo(function (props) {
+  var inputElement = /*#__PURE__*/createElement('div', {});
+  var submitElement = /*#__PURE__*/createElement('div', {});
+  return /*#__PURE__*/createElement('div', {
+    className: 'comment'
+  }, inputElement, submitElement);
+});
+Comment.Enter = CommentEnter;
+Comment.defaultProps = {};
+
+if (window.DEV) {
+  Comment.propTypes = {};
+}
 
 var Fade = function Fade(props) {
   var target = useRef();
@@ -424,4 +548,4 @@ if (window.DEV) {
   };
 }
 
-export { TabPane, TabPlus };
+export { Comment, TabPane, TabPlus };
